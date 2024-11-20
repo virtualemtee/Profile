@@ -1,88 +1,47 @@
-let workbook; // Mock workbook to store processed sheet data
+let workbook; // Global variable to store the workbook
 
 // Initialize event listeners on page load
 document.addEventListener("DOMContentLoaded", () => {
     setupLineSelectionListener();
-    loadGoogleSheetData();
+    loadExcelFromURL();
 });
 
-// Function to load data from a Google Sheet published as CSV
-function loadGoogleSheetData() {
-    const googleSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0f0gLQZ2jTCv8BBBnRXAEAXo1C3vEYDL9qDTh0hdrjgyzScUsidr0Um-NuBXJXda8FM_FRcCbfZaa/pub?output=xlsx"; 
-    fetch(googleSheetURL)
-        .then(response => response.text())
+// Function to fetch Excel file from URL
+function loadExcelFromURL() {
+    const excelURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0f0gLQZ2jTCv8BBBnRXAEAXo1C3vEYDL9qDTh0hdrjgyzScUsidr0Um-NuBXJXda8FM_FRcCbfZaa/pub?output=xlsx";
+
+    fetch(excelURL)
+        .then(response => response.arrayBuffer())
         .then(data => {
-            const parsedData = parseCSV(data);
+            workbook = XLSX.read(data, { type: "array" });
 
-            // Mocking workbook structure with parsed data
-            workbook = {
-                Summary_Line1: convertToSheet(parsedData.line1),
-                Summary_Line2: convertToSheet(parsedData.line2),
-            };
-
-            // Validate sheets
-            if (workbook.Summary_Line1 && workbook.Summary_Line2) {
+            // Validate required sheets
+            const sheetNames = workbook.SheetNames;
+            if (sheetNames.includes("Summary_Line1") && sheetNames.includes("Summary_Line2")) {
                 document.getElementById("lineSelection").style.display = "block";
 
-                // Handle URL parameters
-                const urlParams = new URLSearchParams(window.location.search);
-                const line = urlParams.get("line") || "Summary_Line1";
-                const number = urlParams.get("number");
-
-                if (number) {
-                    displayNumberDetails(line, parseInt(number));
-                } else {
-                    displayLineData(line);
-                }
+                // Default display of Line 1 data
+                displayLineData("Summary_Line1");
             } else {
-                alert("Required data not found in Google Sheet.");
+                alert("Sheets 'Summary_Line1' and 'Summary_Line2' not found in the Excel file.");
             }
         })
         .catch(error => {
-            console.error("Error fetching Google Sheet data:", error);
-            alert("Failed to load data from the Google Sheet.");
+            console.error("Error loading Excel file:", error);
+            alert("Failed to load the Excel file.");
         });
 }
 
-// Parse CSV into JSON
-function parseCSV(data) {
-    const rows = data.split("\n").map(row => row.split(","));
-    const headers = rows[0];
-    const line1Data = [];
-    const line2Data = [];
-
-    rows.slice(1).forEach(row => {
-        if (row[headers.indexOf("Line")] === "1") {
-            line1Data.push(row);
-        } else if (row[headers.indexOf("Line")] === "2") {
-            line2Data.push(row);
-        }
-    });
-
-    return {
-        line1: [headers, ...line1Data],
-        line2: [headers, ...line2Data],
-    };
-}
-
-// Convert parsed data into a sheet-like structure
-function convertToSheet(data) {
-    return data.reduce((acc, row, index) => {
-        acc[index] = row;
-        return acc;
-    }, {});
-}
-
-// Function to display data for the selected line
-function displayLineData(line) {
+// Function to display data for a selected line
+function displayLineData(sheetName) {
     const container = document.getElementById("tableContainer");
     container.innerHTML = ""; // Clear previous data
 
-    const sheet = workbook[line];
-    const sheetData = Object.values(sheet);
+    const sheet = workbook.Sheets[sheetName];
+    const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert sheet to JSON
 
     if (!sheetData || sheetData.length === 0) {
-        alert(`No data found in the sheet "${line}".`);
+        alert(`No data found in the sheet "${sheetName}".`);
         return;
     }
 
@@ -93,9 +52,9 @@ function displayLineData(line) {
     const table = createTable(headers, rows);
     container.appendChild(table);
 
-    // Display details for the first row if available
+    // Display details for the first row (if available)
     if (rows.length > 0) {
-        displayNumberDetails(line, rows[0][0]);
+        displayNumberDetails(sheetName, rows[0][0]);
     }
 }
 
@@ -130,13 +89,13 @@ function createTable(headers, rows) {
 }
 
 // Function to display details for a specific number
-function displayNumberDetails(line, number) {
-    const sheet = workbook[line];
-    const sheetData = Object.values(sheet);
+function displayNumberDetails(sheetName, number) {
+    const sheet = workbook.Sheets[sheetName];
+    const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
     const headers = sheetData[0];
     const rows = sheetData.slice(1);
 
-    const matchingRow = rows.find(row => row[0] == number);
+    const matchingRow = rows.find(row => row[0] === number);
 
     if (matchingRow) {
         const detailsContainer = document.getElementById("cellDetails");
