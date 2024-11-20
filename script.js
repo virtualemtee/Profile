@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Function to load data from a Google Sheet published as CSV
 function loadGoogleSheetData() {
-    const googleSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0f0gLQZ2jTCv8BBBnRXAEAXo1C3vEYDL9qDTh0hdrjgyzScUsidr0Um-NuBXJXda8FM_FRcCbfZaa/pub?output=csv"; 
+    const googleSheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0f0gLQZ2jTCv8BBBnRXAEAXo1C3vEYDL9qDTh0hdrjgyzScUsidr0Um-NuBXJXda8FM_FRcCbfZaa/pub?output=xlsx"; 
     fetch(googleSheetURL)
         .then(response => response.text())
         .then(data => {
