@@ -1,43 +1,78 @@
+/* General Body Styles */
 body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: #f4f6f8;
     color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
+/* Container for the Page */
 .container {
-    max-width: 800px;
-    margin: 50px auto;
+    width: 100%;
+    max-width: 900px;
+    margin: 20px;
     padding: 20px;
     background: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Heading */
 h1 {
+    font-size: 2rem;
+    font-weight: 500;
     text-align: center;
+    color: #333;
     margin-bottom: 20px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+h2 {
+    font-size: 1.5rem;
+    color: #444;
+    margin-bottom: 20px;
 }
 
-table th, table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+/* Field Containers */
+.field-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-table th {
-    background-color: #f8f8f8;
+/* Field Labels */
+.field-label {
     font-weight: bold;
+    color: #333;
+    flex: 1;
 }
 
-table caption {
-    font-size: 18px;
-    margin-bottom: 10px;
+/* Field Values */
+.field-value {
+    font-weight: normal;
+    color: #555;
+    flex: 2;
+    text-align: right;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .field-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .field-label,
+    .field-value {
+        width: 100%;
+        text-align: left;
+    }
 }
