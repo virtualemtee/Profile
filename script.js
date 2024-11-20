@@ -50,70 +50,61 @@ document.addEventListener("DOMContentLoaded", () => {
         const matchingRow = rows.find(row => parseInt(row[0], 10) === number);
 
         if (matchingRow) {
-            const table = document.createElement("table");
-            const caption = document.createElement("caption");
-            caption.textContent = `Data for Number: ${number}`;
-            table.appendChild(caption);
+            const heading = document.createElement("h2");
+            heading.textContent = `LINE ${line.includes("1") ? "1" : "2"}, CELL ${number}`;
+            tableContainer.appendChild(heading);
 
-            // Create table header
-            const headerRow = document.createElement("tr");
-            headers.forEach(header => {
-                const th = document.createElement("th");
-                th.textContent = header || ""; // Handle empty headers
-                headerRow.appendChild(th);
+            // Display each field as a label-value pair
+            headers.forEach((header, index) => {
+                const fieldContainer = document.createElement("div");
+                fieldContainer.classList.add("field-container");
+
+                const label = document.createElement("span");
+                label.classList.add("field-label");
+                label.textContent = `${header}:`;
+
+                const value = document.createElement("span");
+                value.classList.add("field-value");
+                value.textContent = matchingRow[index] || "N/A";
+
+                fieldContainer.appendChild(label);
+                fieldContainer.appendChild(value);
+                tableContainer.appendChild(fieldContainer);
             });
-            table.appendChild(headerRow);
-
-            // Create table row for the matching data
-            const dataRow = document.createElement("tr");
-            matchingRow.forEach(cell => {
-                const td = document.createElement("td");
-                td.textContent = cell || ""; // Handle empty cells
-                dataRow.appendChild(td);
-            });
-            table.appendChild(dataRow);
-
-            tableContainer.innerHTML = ""; // Clear previous content
-            tableContainer.appendChild(table);
         } else {
             tableContainer.innerHTML = `<p>No data found for Number: ${number} in sheet "${line}".</p>`;
         }
     }
 
-    // Function to display the entire sheet in an HTML table
+    // Function to display the entire sheet in an HTML format (not used when number is specified)
     function displayTable(data) {
         if (!data || data.length === 0) {
             tableContainer.innerHTML = "<p>No data found in the Excel file.</p>";
             return;
         }
 
-        const table = document.createElement("table");
-        const caption = document.createElement("caption");
-        caption.textContent = `Data from ${line}`;
-        table.appendChild(caption);
+        const heading = document.createElement("h2");
+        heading.textContent = `Data from ${line}`;
+        tableContainer.appendChild(heading);
 
-        // Create table header
-        const headers = data[0]; // First row as header
-        const headerRow = document.createElement("tr");
-        headers.forEach(header => {
-            const th = document.createElement("th");
-            th.textContent = header || ""; // Handle empty headers
-            headerRow.appendChild(th);
-        });
-        table.appendChild(headerRow);
-
-        // Create table rows
+        // Display each field as a label-value pair for each row
         data.slice(1).forEach(row => {
-            const tr = document.createElement("tr");
-            row.forEach(cell => {
-                const td = document.createElement("td");
-                td.textContent = cell || ""; // Handle empty cells
-                tr.appendChild(td);
-            });
-            table.appendChild(tr);
-        });
+            row.forEach((cell, index) => {
+                const fieldContainer = document.createElement("div");
+                fieldContainer.classList.add("field-container");
 
-        tableContainer.innerHTML = ""; // Clear previous content
-        tableContainer.appendChild(table);
+                const label = document.createElement("span");
+                label.classList.add("field-label");
+                label.textContent = `${data[0][index]}:`;
+
+                const value = document.createElement("span");
+                value.classList.add("field-value");
+                value.textContent = cell || "N/A";
+
+                fieldContainer.appendChild(label);
+                fieldContainer.appendChild(value);
+                tableContainer.appendChild(fieldContainer);
+            });
+        });
     }
 });
