@@ -6,14 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
     loadExcelFromURL();
 });
 
-// Function to fetch Excel file from URL
+// Function to fetch and parse Excel file from a URL
 function loadExcelFromURL() {
     const excelURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0f0gLQZ2jTCv8BBBnRXAEAXo1C3vEYDL9qDTh0hdrjgyzScUsidr0Um-NuBXJXda8FM_FRcCbfZaa/pub?output=xlsx";
 
     fetch(excelURL)
-        .then(response => response.arrayBuffer())
+        .then(response => response.arrayBuffer()) // Fetch as binary data
         .then(data => {
-            workbook = XLSX.read(data, { type: "array" });
+            workbook = XLSX.read(data, { type: "array" }); // Parse binary data into workbook
 
             // Validate required sheets
             const sheetNames = workbook.SheetNames;
