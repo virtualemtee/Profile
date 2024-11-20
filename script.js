@@ -4,14 +4,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // URL of the Google Sheet published as XLSX
     const excelURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0f0gLQZ2jTCv8BBBnRXAEAXo1C3vEYDL9qDTh0hdrjgyzScUsidr0Um-NuBXJXda8FM_FRcCbfZaa/pub?output=xlsx";
 
+    // Extract the desired sheet name from the URL query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const line = urlParams.get("line") || "Summary_Line1"; // Default to Summary_Line1 if not specified
+
     // Fetch the Excel file and display its data
     fetch(excelURL)
         .then(response => response.arrayBuffer()) // Fetch as binary data
         .then(data => {
             const workbook = XLSX.read(data, { type: "array" }); // Parse Excel data
-            const firstSheetName = workbook.SheetNames[0]; // Get the first sheet name
-            const sheet = workbook.Sheets[firstSheetName]; // Get the first sheet
 
+            // Check if the sheet exists
+            if (!workbook.SheetNames.includes(line)) {
+                tableContainer.innerHTML = `<p>Sheet "${line}" not found in the Excel file.</p>`;
+                return;
+            }
+
+            const sheet = workbook.Sheets[line]; // Get the specified sheet
             const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert to JSON (array of arrays)
             displayTable(jsonData); // Display the data in a table
         })
@@ -29,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const table = document.createElement("table");
         const caption = document.createElement("caption");
-        caption.textContent = "Excel Data";
+        caption.textContent = `Data from ${line}`;
         table.appendChild(caption);
 
         // Create table header
